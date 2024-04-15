@@ -1,0 +1,236 @@
+<!--game.html-->
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partie de jeu</title>
+    <link rel="stylesheet" href="game-styles.css"> 
+
+    <script>
+        window.onunload = function() {
+            // Suppression systématique des données du jeu
+            sessionStorage.removeItem('generatedWord');
+            sessionStorage.removeItem('currentAttempt');
+
+            if (sessionStorage.getItem('usingBackButton') !== 'true') {
+                // Si le bouton retour n'est pas utilisé, tout effacer et rediriger vers index.html
+                sessionStorage.clear();
+                window.location.href = '/index.html';
+            } else {
+                // Nettoyer la marque du bouton retour
+                sessionStorage.removeItem('usingBackButton');
+            }
+        };
+    </script>
+    
+
+</head>
+<body>
+    <!-- Contenu de la page de gestion de la partie -->
+    <h1>Partie de jeu</h1>
+    <div id="game-container">
+        <!-- Tableau de jeu -->
+        <table id="game-table">
+        </table>
+        <form id="attempt-form">
+            <button id="submit-attempt">Valider</button>
+        </form>
+        <div id="feedback"></div>
+        <button id="back-button">Retour</button>
+        <img src="sound_on.png" id="toggle-sound" alt="Couper le son">
+    </div>
+
+<script src="game.js" type="module"></script>
+
+
+    <script>
+        // Récupérer le mot à deviner depuis le stockage de la session
+        const generatedWord = sessionStorage.getItem('generatedWord');
+
+        if (generatedWord) {
+            const wordLength = generatedWord.length;
+            const maxAttempts = 6;
+            let currentAttempt = 0;
+
+            // Générer le tableau de jeu avec une ligne pour chaque essai
+            const gameTable = document.getElementById('game-table');
+
+            for (let attempt = 0; attempt < maxAttempts; attempt++) {
+                const tableRow = document.createElement('tr');
+
+                // Créer dynamiquement les cellules du tableau pour chaque lettre du mot
+                for (let j = 0; j < wordLength; j++) {
+                    const tableCell = document.createElement('td');
+                    if (attempt === 0) {
+                        if (j === 0) {
+                            tableCell.textContent = generatedWord[0]; // Première lettre du mot
+                        } else {
+                            tableCell.textContent = '.'; // Initialiser chaque case de la première ligne avec un point
+                            tableCell.setAttribute('data-placeholder', 'Rechercher');
+                            tableCell.addEventListener('focus', function() {
+                                if (this.textContent === '.') {
+                                    this.textContent = '';
+                                }
+                            });
+                            tableCell.addEventListener('blur', function() {
+                                if (this.textContent === '') {
+                                    this.textContent = '.';
+                                }
+                            });
+                        }
+                        tableCell.contentEditable = true; // Permettre la modification du contenu
+                        tableCell.addEventListener('input', function() {
+                            if (this.textContent.length > 1) {
+                                this.textContent = this.textContent.slice(0, 1); // Limiter à un seul caractère
+                            }
+                        });
+                    } else {
+                        tableCell.textContent = ''; // Laisser les autres cases vides pour les essais
+                    }
+                    tableRow.appendChild(tableCell);
+                }
+
+                // Ajouter la ligne de tableau à la table HTML
+                gameTable.appendChild(tableRow);
+            }
+
+            // Écouter l'événement de soumission du formulaire
+            const form = document.getElementById('attempt-form');
+            form.addEventListener('submit', function(event) {
+                event.preventDefault(); // Empêcher le rechargement de la page
+
+                // Récupérer la proposition de l'utilisateur
+                const cells = document.querySelectorAll('#game-table tr:nth-child(' + (currentAttempt + 1) + ') td');
+                let attempt = '';
+                cells.forEach(cell => {
+                    attempt += cell.textContent.toUpperCase();
+                });
+                
+                // Valider la proposition de l'utilisateur
+                const feedback = validateAttempt(attempt);
+
+                // Afficher le feedback
+                const feedbackDisplay = document.getElementById('feedback');
+                feedbackDisplay.textContent = feedback;
+
+                // Réduire le nombre d'essais restants
+                maxAttempts--;
+
+                // Si l'utilisateur a trouvé le mot, terminer le jeu
+                if (feedback.includes('◼◼◼◼◼◼')) {
+                    feedbackDisplay.textContent = 'Félicitations ! Vous avez trouvé le mot : ' + generatedWord;
+                    maxAttempts = 0; // Terminer le jeu
+                }
+
+                // Si l'utilisateur a épuisé tous les essais, terminer le jeu
+                if (maxAttempts === 0) {
+                    feedbackDisplay.textContent = 'Vous avez épuisé tous les essais. Le mot à deviner était : ' + generatedWord;
+                }
+
+                // Désactiver l'édition de la ligne précédente
+                if (currentAttempt > 0) {
+                    const previousRowCells = document.querySelectorAll('#game-table tr:nth-child(' + currentAttempt + ') td');
+                    previousRowCells.forEach(cell => {
+                        cell.contentEditable = false;
+                    });
+                }
+
+                // Passer à la ligne suivante
+                currentAttempt++;
+            });
+
+            function updatePlayerStats(victory, attempts) {
+    const data = {
+        pseudo: 'username',
+        victory: victory,
+        attempts: attempts
+    };
+
+    fetch('update_stats.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Success:', data);
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', (event) => {
+    const submitButton = document.getElementById('submit-attempt');
+    const gameTable = document.getElementById('game-table');
+
+    function updateSubmitButtonPosition() {
+        const currentRow = document.querySelector(`#game-table tr:nth-child(${currentAttempt + 1})`);
+        
+        const gameRect = gameTable.getBoundingClientRect();
+        
+        const submitButtonLeft = gameTable.offsetLeft + gameTable.offsetWidth + 20;
+
+        submitButton.style.left = `${submitButtonLeft}px`;
+    }
+
+    let currentAttempt = 0;
+    const maxAttempts = 6;
+
+    const form = document.getElementById('attempt-form');
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        currentAttempt++;
+        updateSubmitButtonPosition();
+    });
+
+    updateSubmitButtonPosition(); // Appel initial pour positionner le bouton au chargement de la page
+});
+        } else {
+            console.log('Aucun mot généré trouvé.');
+        }
+    </script>
+    <audio id="correctSound" preload="auto">
+        <source src="correct.mp3" type="audio/mp3">
+    </audio>
+    <audio id="wrongLocationSound" preload="auto">
+        <source src="wrong.mp3" type="audio/mp3">
+    </audio>
+    <audio id="notInWordSound" preload="auto">
+        <source src="not_in_word.mp3" type="audio/mp3">
+    </audio>
+    <script>
+document.addEventListener("DOMContentLoaded", function() {
+            const backButton = document.getElementById('back-button');
+            const restartButton = document.getElementById('restart-button');
+
+            backButton.addEventListener('click', () => {
+                sessionStorage.setItem('usingBackButton', 'true');
+                window.location.href = 'selection.html';
+            });
+
+            if (!sessionStorage.getItem('isAuthenticated')) {
+                window.location.href = '/index.html';
+            }
+        });
+    </script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const userMessage = document.getElementById('user-message');
+        if (sessionStorage.getItem('isAuthenticated') && sessionStorage.getItem('pseudo')) {
+            userMessage.textContent = "Connexté en tant que: " + sessionStorage.getItem('pseudo');
+        } else {
+            window.location.href = '/index.html';  // Redirection si pas authentifié
+        }
+    });
+</script>
+
+    <div id="user-message" style="position: absolute; top: 0; left: 0; padding: 10px;">Connecté en tant que: Pseudo</div>
+
+</body>
+</html>

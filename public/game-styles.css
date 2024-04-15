@@ -1,0 +1,106 @@
+/*game-styles.css*/
+
+/* Style pour la page de jeu */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #0277C7; /* Bleu comme couleur de fond */
+    padding: 20px;
+    color: #ffffff; /* Texte en blanc pour un bon contraste */
+}
+
+h1 {
+    text-align: center;
+}
+
+#game-container {
+    position: relative; /* Essentiel pour positionner les fils absolument par rapport à ce conteneur */
+    width: fit-content;
+    margin: auto; /* Centre le container horizontalement */
+    padding-bottom: 50px; /* Espace pour message sous le tableau */
+}
+
+#game-table {
+    margin: 0 auto;
+    border-collapse: collapse;
+}
+
+#game-table td {
+    width: 50px;
+    height: 50px;
+    border: 2px solid #f0f0f0; /* Définit la bordure avec une épaisseur de 2px et la couleur spécifiée */
+    background-color: #0277C7; /* Définit la couleur de fond des cases */
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    color: white; /* Définit la couleur du texte en blanc */
+    text-transform: uppercase; /* Convertit le texte en majuscules */
+}
+
+#submit-attempt {
+    width: 49.2px; /* Largeur du bouton pour correspondre à la largeur des cellules du tableau */
+    height: 51px; /* Hauteur du bouton pour correspondre à la hauteur des cellules du tableau */
+    padding: 0;
+    position: absolute; /* Assurez-vous que cette propriété est définie pour positionner dynamiquement le bouton */
+    margin-top: 3px; /* Ajustez selon les besoins pour l'alignement vertical */
+    /* Pas besoin de définir right ici puisque nous allons ajuster left dynamiquement via JavaScript */
+    background-color: #c78902; /* Couleur d'arrière-plan pour correspondre au tableau (facultatif) */
+    color: white; /* Couleur du texte */
+    border: 0px solid #f0f0f0; /* Bordure pour correspondre aux cellules du tableau */
+    cursor: pointer; /* Change le curseur en main lors du survol pour indiquer que c'est un bouton */
+    font-size: 12px; /* Ajustez selon les besoins pour correspondre à la taille du texte dans les cellules du tableau */
+	transition: top 0.5s ease, left 0.5s ease; /* Ajoute une transition douce pour top et left */
+}
+
+/* Lettre bien placée : Carré rouge */
+.correct-location {
+    background-color: red !important; /* Remplacez par une bordure rouge si vous préférez */
+    color: white; /* Couleur du texte pour assurer la lisibilité */
+}
+
+/* Lettre mal placée : Cercle jaune */
+.wrong-location {
+    background-color: rgb(255, 196, 0) !important; /* Pour un cercle, vous pourriez vouloir utiliser une bordure ou un élément de décoration */
+    color: rgb(255, 255, 255); /* Couleur du texte pour assurer la lisibilité */
+    border-radius: 50%; /* Rendre la cellule circulaire */
+    width: 50px ; /* Ajuster selon la taille de votre cellule */
+    height: 50px ; /* Ajuster selon la taille de votre cellule */
+    display: flex;
+    align-items: center; /* Centre verticalement */
+    justify-content: center; /* Centre horizontalement */
+    /* Utiliser une bordure solide jaune */
+}
+
+/* Style for the sound toggle button (image) */
+#toggle-sound {
+    position: absolute; /* Positionnement absolu par rapport à #game-container */
+    width: 50px; /* adjust size as needed */
+    height: 50px; /* adjust size as needed */
+    bottom: 0px;     /* Espacement du bas de la fenêtre */
+    right: 0px;       /* Espacement du côté gauche de la fenêtre */
+    cursor: pointer;
+}
+
+#user-message {
+    font-weight: bold;  
+    color: white;      
+    font-size: 16px;    
+}
+
+#feedback {
+    position: absolute; /* Positionnement absolu par rapport à #game-container */
+    width: 100%;
+    text-align: center;
+    bottom: -70px; /* Position sous le tableau */
+    left: 0;
+    font-size: 20px;
+    font-weight: bold
+}
+
+#back-button {
+    position: absolute; /* Positionnement absolu par rapport à #game-container */
+    background-color: #f44336; 
+    color: white;
+    bottom: 20px;     /* Espacement du bas de la fenêtre */
+    left: 0px;       /* Espacement du côté gauche de la fenêtre */
+    z-index: 1000;    /* S'assure que le bouton reste au-dessus des autres éléments */
+}

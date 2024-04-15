@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Motus - Jeu de Devinettes</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .button-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .button-container button {
+            margin: 0 10px;
+        }
+        #login-form {
+            display: none;
+            text-align: center;
+        }
+    </style>
+    <script type="module" src="client_connexion.js"></script>
+    <script type="module">
+        import { authenticateUser, registerUser } from './client_connexion.js';
+        
+        document.addEventListener("DOMContentLoaded", function() {
+            const loginForm = document.getElementById('login-form');
+            const btnLogin = document.getElementById('btn-login');
+            const btnRegister = document.getElementById('btn-register');
+            const btnBack = document.getElementById('btn-back');
+            const btnGetUsers = document.getElementById('btn-get-users');
+            const pseudoInput = document.getElementById('pseudo');
+            const passwordInput = document.getElementById('password');
+
+            btnLogin.addEventListener('click', () => {
+                loginForm.style.display = 'block';
+                btnBack.style.display = 'inline-block';
+                btnLogin.style.display = 'none';
+                btnRegister.style.display = 'none';
+                document.getElementById('btn-submit-login').style.display = 'inline-block';
+                document.getElementById('btn-submit-register').style.display = 'none';
+            });
+
+            btnRegister.addEventListener('click', () => {
+                loginForm.style.display = 'block';
+                btnBack.style.display = 'inline-block';
+                btnLogin.style.display = 'none';
+                btnRegister.style.display = 'none';
+                document.getElementById('btn-submit-login').style.display = 'none';
+                document.getElementById('btn-submit-register').style.display = 'inline-block';
+
+            });
+
+            document.getElementById('btn-submit-login').addEventListener('click', async () => {
+                try {
+                    await authenticateUser(pseudoInput.value, passwordInput.value);
+                    window.location.href = '/selection.html';
+                } catch (error) {
+                    console.error('Erreur lors de la connexion :', error);
+                }
+            });
+
+
+            btnBack.addEventListener('click', () => {
+                loginForm.style.display = 'none';
+                btnBack.style.display = 'none';
+                btnLogin.style.display = 'inline-block';
+                btnRegister.style.display = 'inline-block';
+
+            });
+
+            if (sessionStorage.getItem('isAuthenticated')) {
+                window.location.href = '/selection.html';  // Redirection si déjà authentifié
+            }
+        });
+    </script>
+</head>
+<body>
+    <h1>Bienvenue sur Motus</h1>
+    <div class="button-container">
+        <button id="btn-login">Se connecter</button>
+        <button id="btn-register">S'inscrire</button>
+
+    </div>
+    <button id="btn-back" style="display: none;">Retour</button>
+    <div id="login-form">
+        <input type="text" id="pseudo" placeholder="Pseudo">
+        <input type="password" id="password" placeholder="Mot de passe">
+        <button id="btn-submit-login" style="display: none;">Se connecter</button>
+        <button id="btn-submit-register" style="display: none;">S'inscrire</button>
+    </div>
+    <div id="feedback-display"></div>
+    
+</body>
+</html>

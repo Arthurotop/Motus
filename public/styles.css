@@ -1,0 +1,22 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #0277C7; /* Bleu comme couleur de fond */
+    color: #ffffff; /* Texte en blanc pour un bon contraste */
+}
+
+button {
+    padding: 10px 20px;
+    margin: 0 10px;
+    background-color: rgb(255, 196, 0);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+

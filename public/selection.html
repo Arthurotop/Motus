@@ -1,0 +1,140 @@
+<!-- selection.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choix de la difficulté</title>
+    <link rel="stylesheet" href="selection-styles.css"> 
+    <script src="difficultyLevels.js" type="module"></script>
+
+</head>
+<body>
+    <h1>Choix du nombre de lettre dans le mot</h1>
+    
+    <form id="game-options-form">
+        <input type="number" id="word-length" name="word-length" min="4" max="10" value="5">
+        <button type="button" id="start-game-button">Commencer le jeu</button>
+    </form>
+
+
+
+    <script type="module">
+        document.addEventListener("DOMContentLoaded", function() {
+            const startGameButton = document.getElementById('start-game-button');
+            const toggleSoundButton = document.getElementById('toggle-sound');
+            
+            // Redirection si pas authentifié
+            if (!sessionStorage.getItem('isAuthenticated')) {
+                window.location.href = '/index.html';
+            }
+
+            if (startGameButton) {
+                startGameButton.addEventListener('click', function() {
+                    const selectedDifficulty = document.querySelector('input[name="difficulty"]:checked');
+                    if (selectedDifficulty) {
+                        import('./difficultyLevels.js')
+                            .then(module => {
+                                module.generateWordByDifficulty(selectedDifficulty.value);
+                            });
+                    }
+                });
+            }
+
+            if (toggleSoundButton) {
+                toggleSoundButton.addEventListener('click', () => {
+                });
+            }
+        });
+    </script>
+
+    <script src="main.js" type="module"></script>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const userMessage = document.getElementById('user-message');
+            if (sessionStorage.getItem('isAuthenticated') && sessionStorage.getItem('pseudo')) {
+                userMessage.textContent = "Connexté en tant que: " + sessionStorage.getItem('pseudo');
+            } else {
+                window.location.href = '/index.html';  // Redirection si pas authentifié
+            }
+        });
+    </script>
+
+<div id="user-message" style="position: absolute; top: 0; left: 0; padding: 10px;">Connexté en tant que: Pseudo</div>
+
+<div id="ranking">
+    <h2>Classement des joueurs</h2>
+    <table id="ranking-table">
+        <thead>
+            <tr>
+                <th>Classement</th>
+                <th>Pseudo</th>
+                <th>Victoires</th>
+                <th>Ratio</th>
+            </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
+</div>
+<div id="ranking-controls">
+    <button id="sort-by-victories">Trier par Nombre de Victoires</button>
+    <button id="sort-by-ratio">Trier par Ratio</button>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", async function() {
+    const sortByVictoriesBtn = document.getElementById('sort-by-victories');
+    const sortByRatioBtn = document.getElementById('sort-by-ratio');
+
+    async function fetchAndDisplayRanking(sortKey = 'nombre_de_victoires') {
+        const response = await fetch(`/ranking?sort=${sortKey}`);
+        const data = await response.json();
+        
+        const tableBody = document.getElementById('ranking-table').getElementsByTagName('tbody')[0];
+        tableBody.innerHTML = ''; 
+
+        data.topPlayers.forEach((player, index) => {
+            const row = tableBody.insertRow();
+            const cells = [row.insertCell(0), row.insertCell(1), row.insertCell(2), row.insertCell(3)];
+            cells[0].textContent = index + 1;
+            cells[1].textContent = player.pseudo;
+            cells[2].textContent = player.nombre_de_victoires;
+            cells[3].textContent = player.ratio + '%';
+
+
+            if (parseInt(player.id, 10) === parseInt(sessionStorage.getItem('userId'), 10)) {
+                cells.forEach(cell => {
+                    cell.style.backgroundColor = '#cf4a4a'; 
+                    cell.style.color = '#ffffff'; 
+                });
+                console.log("Highlighting row for user ID:", player.id);
+            }
+        });
+
+
+        if (data.currentUser) {
+            const row = tableBody.insertRow();
+            const cells = [row.insertCell(0), row.insertCell(1), row.insertCell(2), row.insertCell(3)];
+            cells[0].textContent = data.currentUser.rank;
+            cells[1].textContent = data.currentUser.pseudo;
+            cells[2].textContent = data.currentUser.nombre_de_victoires;
+            cells[3].textContent = data.currentUser.ratio + '%';
+            cells.forEach(cell => {
+                cell.style.backgroundColor = '#cf4a4a'; 
+                cell.style.color = '#ffffff'; 
+            });
+        }
+    }
+
+    sortByVictoriesBtn.addEventListener('click', () => fetchAndDisplayRanking('nombre_de_victoires'));
+    sortByRatioBtn.addEventListener('click', () => fetchAndDisplayRanking('ratio'));
+
+    fetchAndDisplayRanking();
+});
+
+</script>
+
+</body>
+</html>
