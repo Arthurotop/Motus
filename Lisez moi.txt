@@ -3,9 +3,14 @@
 Pour configurer la base de données nécessaire pour ce projet, veuillez suivre ces étapes :
 
 1. Installez MySQL sur votre machine si ce n'est pas déjà fait.
-2. Ouvrez votre interface MySQL, importer la base de donnée 
+2. Ouvrez votre interface MySQL avec les identifiants "root" et rien en mot de passe, importer la base de donnée 
 3. assurez vous que les informations de la base correspondent avec celle du fichier connexion.js (c'est mieux)
-4. Profitez ! 
+4. Installer Node.js
+5. Ouvre l'invité de commande, déplacer vous dans le dossier du jeu (cd /desktop/node.js-main pour ma part)
+6. Exécuter la commande node app.js
+7. Rendez-vous à l'addresse 127.0.0.1:3005
+8. Profitez !
+ 
 
 J'ai beaucoup apprécié faire ce devoir, ce n'est pas ce que j'ai l'habitude de faire donc ça m'a forcé à sortir de ma zone de confort, j'espère avoir réussis le test et que vous prenez du plaisir à jouer sur cette 126ème version de motus que vous avez du recevoir
 
