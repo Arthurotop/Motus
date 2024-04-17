@@ -7,20 +7,6 @@ let victory = false;
 export async function generateWordByDifficulty(difficulty) {
   let generatedWord;
 
-  switch (difficulty) {
-    case 'easy':
-      generatedWord = await generateWordEasy();
-      break;
-    case 'medium':
-      generatedWord = await generateWordInter();
-      break;
-    case 'hard':
-      generatedWord = await generateWordDiff();
-      break;
-    default:
-      throw new Error('Niveau de difficulté invalide.');
-  }
-
   sessionStorage.setItem('generatedWord', generatedWord);
   window.location.href = 'game.html';
 }
@@ -117,19 +103,29 @@ export function validateAttempt(attempt) {
 
 
 function initNextRow() {
-  if (currentAttempt < maxAttempts) {
+    if (currentAttempt < maxAttempts) {
       const nextRowCells = document.querySelectorAll('#game-table tr')[currentAttempt].cells;
       for (const cell of nextRowCells) {
           cell.textContent = '.';
           cell.contentEditable = "true";
-          cell.onclick = function() {
-              if (!this.classList.contains('correct-location')) {
-                  this.textContent = ''; // Ne vide le contenu que si la cellule n'est pas correctement placée
-              }
+          cell.onclick = function() {       
           };
+  
+          // Limiter la saisie à un seul caractère et passer à la cellule suivante
+          cell.addEventListener('input', function() {
+              if (this.textContent.length > 1) {
+                  this.textContent = this.textContent.charAt(0); // Conserve uniquement le premier caractère
+              }
+              if (this.textContent.length === 1) {
+                  const nextCell = this.nextElementSibling;
+                  if (nextCell && nextCell.contentEditable === "true") {
+                      nextCell.focus(); // Déplacer le focus à la cellule suivante
+                  }
+              }
+          });
       }
+    }
   }
-}
 
 // Rapporte les lettres correctes à la ligne suivante avec un délai de 1 seconde
 function reportCorrectLettersToNextRow() {
@@ -240,6 +236,7 @@ form.addEventListener('submit', function(event) {
             nextRowCells.forEach(cell => {
                 cell.contentEditable = "true";
             });
+            
         }
         setTimeout(() => {
             submitButton.disabled = false;  // Re-enable the button after all animations

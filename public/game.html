@@ -85,6 +85,12 @@
                             if (this.textContent.length > 1) {
                                 this.textContent = this.textContent.slice(0, 1); // Limiter à un seul caractère
                             }
+                            if (this.textContent.length === 1) {
+                                const nextCell = this.nextElementSibling;
+                                if (nextCell && nextCell.contentEditable === "true") {
+                                    nextCell.focus();
+                                }
+                            }                            
                         });
                     } else {
                         tableCell.textContent = ''; // Laisser les autres cases vides pour les essais

@@ -8,7 +8,7 @@ body {
 button {
     padding: 10px 20px;
     margin: 0 10px;
-    background-color: rgb(255, 196, 0);
+    background-color: #0056b3;
     color: #fff;
     border: none;
     border-radius: 5px;
@@ -17,6 +17,6 @@ button {
 }
 
 button:hover {
-    background-color: #0056b3;
+    background-color: rgb(255, 196, 0);
 }
 
