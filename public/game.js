@@ -119,13 +119,20 @@ function initNextRow() {
               if (this.textContent.length === 1) {
                   const nextCell = this.nextElementSibling;
                   if (nextCell && nextCell.contentEditable === "true") {
-                      nextCell.focus(); // Déplacer le focus à la cellule suivante
-                  }
-              }
-          });
-      }
+                    nextCell.focus(); // Déplacer le focus à la cellule suivante
+                }
+            }
+        });
+
+        // Ajout pour empêcher la navigation au "Entrée"
+        cell.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Empêcher le comportement par défaut de la touche "Entrée"
+            }
+        });
     }
-  }
+}
+}
 
 // Rapporte les lettres correctes à la ligne suivante avec un délai de 1 seconde
 function reportCorrectLettersToNextRow() {
