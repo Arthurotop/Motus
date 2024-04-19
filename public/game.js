@@ -26,6 +26,7 @@ export function validateAttempt(attempt) {
   }
 
   const submitButton = document.getElementById('submit-attempt'); 
+  // Première passe pour identifier les lettres correctement placées
   for (let i = 0; i < attempt.length; i++) {
       const letter = attempt[i].toUpperCase();
       if (letter === generatedWord[i]) {
@@ -34,7 +35,6 @@ export function validateAttempt(attempt) {
           setTimeout(() => {
               currentRowCells[i].classList.add('correct-location');
               playSound('correctSound');
-  
               
               if (i === attempt.length - 1) {
                   setTimeout(() => {
@@ -45,13 +45,13 @@ export function validateAttempt(attempt) {
           isAnyCorrect = true;
       }
   }
-  
+
+  // Deuxième passe pour identifier les lettres mal placées ou non présentes
   for (let i = 0; i < attempt.length; i++) {
       const letter = attempt[i].toUpperCase();
-      if (letter !== generatedWord[i] && generatedLetterCounts[letter] > 0 && !currentRowCells[i].classList.contains('correct-location')) {
-          attemptLetterCounts[letter] = (attemptLetterCounts[letter] || 0) + 1;
-          if (attemptLetterCounts[letter] <= generatedLetterCounts[letter]) {
-              generatedLetterCounts[letter]--;
+      if (letter !== generatedWord[i]) {
+          if (generatedLetterCounts[letter] > 0) { // Vérifier s'il reste des occurrences non placées de la lettre
+              generatedLetterCounts[letter]--; // Décompter l'occurrence utilisée
               setTimeout(() => {
                   const contentSpan = document.createElement('span');
                   contentSpan.textContent = letter;
@@ -59,8 +59,7 @@ export function validateAttempt(attempt) {
                   currentRowCells[i].innerHTML = '';
                   currentRowCells[i].appendChild(contentSpan);
                   playSound('wrongLocationSound');
-  
-                  
+
                   if (i === attempt.length - 1) {
                       setTimeout(() => {
                           submitButton.disabled = false;
@@ -68,31 +67,40 @@ export function validateAttempt(attempt) {
                   }
               }, i * 500);
               isAnyCorrect = true;
+          } else {
+              setTimeout(() => {
+                  currentRowCells[i].classList.add('not-in-word');
+                  playSound('notInWordSound');
+
+                  if (i === attempt.length - 1) {
+                      setTimeout(() => {
+                          submitButton.disabled = false;
+                      }, 500); 
+                  }
+              }, i * 500);
           }
-      } else if (!currentRowCells[i].classList.contains('correct-location')) {
-          setTimeout(() => {
-              currentRowCells[i].classList.add('not-in-word');
-              playSound('notInWordSound');
-  
-              
-              if (i === attempt.length - 1) {
-                  setTimeout(() => {
-                      submitButton.disabled = false;
-                  }, 500); 
-              }
-          }, i * 500);
       }
   }
+
   
 
   currentAttempt++;
   if (victory || currentAttempt >= maxAttempts) {
-    if (victory) {
-      document.getElementById('feedback').textContent = 'Félicitations ! Vous avez trouvé le mot : ' + generatedWord;
-    } else {
-      document.getElementById('feedback').textContent = 'Vous avez épuisé tous vos essais. Le mot à deviner était : ' + generatedWord;
+if (victory) {
+        document.getElementById('feedback').textContent = 'Félicitations ! Vous avez trouvé le mot : ' + generatedWord;
+        document.getElementById('submit-attempt').disabled = true;  // Désactiver le bouton de soumission
+        return true;  // Retourner la victoire
     }
-    document.getElementById('submit-attempt').disabled = true;
+
+    // Incrementer le nombre d'essais
+    currentAttempt++;
+
+    // Vérifier si tous les essais sont épuisés
+    if (currentAttempt >= maxAttempts) {
+        document.getElementById('feedback').textContent = 'Vous avez épuisé tous vos essais. Le mot à deviner était : ' + generatedWord;
+        document.getElementById('submit-attempt').disabled = true;
+        return false;
+    }
     updatePlayerStats(victory, currentAttempt);
     return;
   }
